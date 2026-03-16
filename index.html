@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acty Labs — Your Car. Your Data.</title>
+<meta name="description" content="Acty is a privacy-first automotive intelligence platform. Owner-encrypted telemetry, tamper-evident reports, and ML-powered insights — without selling your data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0a0b0e;
+    --bg2:      #111318;
+    --bg3:      #181c24;
+    --border:   rgba(255,255,255,0.07);
+    --border2:  rgba(255,255,255,0.12);
+    --text:     #e8e6e0;
+    --muted:    #8a8880;
+    --accent:   #c8f542;
+    --accent2:  #4af0b0;
+    --accent3:  #ff6b35;
+    --mono:     'DM Mono', monospace;
+    --sans:     'Syne', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,11,14,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    padding: 0.5rem 1.1rem;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: opacity 0.2s, transform 0.15s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 8rem 2.5rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,245,66,0.06) 0%, transparent 70%);
+    top: -100px; left: -150px;
+    pointer-events: none;
+  }
+
+  .hero-glow-2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,240,176,0.05) 0%, transparent 70%);
+    bottom: 0; right: -100px;
+    pointer-events: none;
+  }
+
+  .hero-inner { position: relative; max-width: 900px; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.1s forwards;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.25s forwards;
+  }
+
+  h1 .line2 {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(232,230,224,0.25);
+  }
+
+  h1 .accent-word { color: var(--accent); }
+
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.4s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.55s forwards;
+  }
+
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    padding: 0.85rem 1.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+
+  .btn-ghost {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border2);
+    padding: 0.85rem 1.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+  .hero-stat-row {
+    display: flex; gap: 3rem;
+    margin-top: 4rem; padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.7s 0.7s forwards;
+  }
+
+  .hero-stat { }
+  .hero-stat-value {
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--accent);
+    font-family: var(--mono);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 0.75rem 0;
+  }
+  .ticker {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 2.5rem;
+    display: flex; align-items: center; gap: 2.5rem;
+  }
+  .ticker-item::after {
+    content: '◆';
+    color: var(--accent);
+    font-size: 0.45rem;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 2.5rem; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  h2 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-sub {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how-section { background: var(--bg); }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    margin-top: 4rem;
+    border: 1px solid var(--border);
+    background: var(--border);
+  }
+
+  .step-card {
+    background: var(--bg2);
+    padding: 2.5rem 2rem;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .step-card:hover { background: var(--bg3); }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.25rem;
+    opacity: 0.7;
+  }
+
+  .step-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .step-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.01em;
+  }
+
+  .step-body {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .step-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--accent2);
+    border: 1px solid rgba(74,240,176,0.25);
+    padding: 0.2rem 0.55rem;
+    margin-top: 1rem;
+  }
+
+  /* ── FEATURES ── */
+  .features-section {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .features-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    margin-top: 4rem;
+    align-items: start;
+  }
+
+  .feature-list { display: flex; flex-direction: column; gap: 0; }
+
+  .feature-item {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: padding-left 0.25s;
+  }
+  .feature-item:first-child { border-top: 1px solid var(--border); }
+  .feature-item:hover { padding-left: 0.5rem; }
+
+  .feature-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .feature-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+
+  .feature-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .feature-body {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+    padding-left: 1.25rem;
+  }
+
+  /* Terminal card */
+  .terminal {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    position: sticky;
+    top: 6rem;
+  }
+
+  .terminal-bar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.65rem 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-dot-r { background: #ff5f57; }
+  .term-dot-y { background: #febc2e; }
+  .term-dot-g { background: #28c840; }
+  .terminal-label {
+    font-size: 0.68rem; color: var(--muted);
+    letter-spacing: 0.08em; margin-left: auto;
+  }
+
+  .terminal-body { padding: 1.5rem; }
+  .t-line { display: flex; gap: 0.6rem; margin-bottom: 0.5rem; line-height: 1.6; }
+  .t-prompt { color: var(--accent); }
+  .t-cmd { color: var(--text); }
+  .t-comment { color: var(--muted); font-style: italic; }
+  .t-out { color: var(--accent2); padding-left: 1.2rem; }
+  .t-out-w { color: #fbbf24; padding-left: 1.2rem; }
+  .t-blank { height: 0.6rem; }
+  .t-section { color: var(--muted); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0.8rem 0 0.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+
+  /* ── PRIVACY ── */
+  .privacy-section { background: var(--bg); }
+
+  .privacy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .privacy-card {
+    border: 1px solid var(--border);
+    padding: 1.75rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .privacy-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .privacy-card:hover { border-color: var(--border2); }
+  .privacy-card:hover::before { transform: scaleX(1); }
+
+  .privacy-card-icon {
+    font-size: 1.3rem; margin-bottom: 1rem; display: block;
+  }
+
+  .privacy-card-title {
+    font-size: 0.92rem; font-weight: 700;
+    margin-bottom: 0.5rem; letter-spacing: -0.01em;
+  }
+
+  .privacy-card-body {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  /* audience strip */
+  .audience-strip {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 4rem 2.5rem;
+  }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 3rem;
+    border: 1px solid var(--border);
+  }
+
+  .audience-card {
+    background: var(--bg2);
+    padding: 2rem 1.75rem;
+    transition: background 0.25s;
+  }
+  .audience-card:hover { background: var(--bg3); }
+
+  .audience-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+  .tag-consumer { color: var(--accent); border: 1px solid rgba(200,245,66,0.3); }
+  .tag-dev { color: var(--accent2); border: 1px solid rgba(74,240,176,0.3); }
+  .tag-biz { color: var(--accent3); border: 1px solid rgba(255,107,53,0.3); }
+
+  .audience-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .audience-body {
+    font-family: var(--mono);
+    font-size: 0.78rem; color: var(--muted); line-height: 1.75; font-weight: 300;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .footer-links {
+    display: flex; gap: 1.5rem; list-style: none;
+  }
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 0.7rem; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── CURSOR BLINK ── */
+  .blink {
+    display: inline-block;
+    width: 8px; height: 1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1.1s step-end infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.25rem; }
+    .nav-links { display: none; }
+    section, .audience-strip { padding: 4rem 1.25rem; }
+    .hero { padding: 7rem 1.25rem 4rem; }
+    .features-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .terminal { position: static; }
+    .audience-grid { grid-template-columns: 1fr; }
+    .hero-stat-row { gap: 2rem; flex-wrap: wrap; }
+    footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">acty_labs</a>
+  <ul class="nav-links">
+    <li><a href="#how">how it works</a></li>
+    <li><a href="#features">features</a></li>
+    <li><a href="#privacy">privacy</a></li>
+  </ul>
+  <a href="mailto:hello@acty-labs.com" class="nav-cta">get early access</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Privacy-first automotive intelligence</p>
+    <h1>
+      Your car.<br>
+      <span class="line2">Your <span class="accent-word">data.</span></span>
+    </h1>
+    <p class="hero-sub">
+      Acty captures real OBD-II telemetry from your vehicle, runs ML-powered diagnostics locally, and generates tamper-evident reports — without ever selling your data.
+    </p>
+    <div class="hero-actions">
+      <a href="mailto:hello@acty-labs.com" class="btn-primary">Request early access</a>
+      <a href="#how" class="btn-ghost">See how it works →</a>
+    </div>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <div class="hero-stat-value">123</div>
+        <div class="hero-stat-label">PIDs captured</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">Ed25519</div>
+        <div class="hero-stat-label">Signed reports</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">0</div>
+        <div class="hero-stat-label">Data brokers paid</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">ε ≤ 1.0</div>
+        <div class="hero-stat-label">Differential privacy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item">OBD-II telemetry capture</div>
+    <div class="ticker-item">Owner-encrypted data</div>
+    <div class="ticker-item">ML-powered diagnostics</div>
+    <div class="ticker-item">Ed25519 signed reports</div>
+    <div class="ticker-item">Federated learning</div>
+    <div class="ticker-item">Differential privacy ε ≤ 1.0</div>
+    <div class="ticker-item">Zero data brokerage</div>
+    <div class="ticker-item">32Gb FC SAN</div>
+    <div class="ticker-item">OBD-II telemetry capture</div>
+    <div class="ticker-item">Owner-encrypted data</div>
+    <div class="ticker-item">ML-powered diagnostics</div>
+    <div class="ticker-item">Ed25519 signed reports</div>
+    <div class="ticker-item">Federated learning</div>
+    <div class="ticker-item">Differential privacy ε ≤ 1.0</div>
+    <div class="ticker-item">Zero data brokerage</div>
+    <div class="ticker-item">32Gb FC SAN</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-label">how it works</div>
+  <h2>From plug-in to insight<br>in minutes.</h2>
+  <p class="section-sub reveal">A hardware dongle, a mobile app, and a local inference pipeline — no cloud required.</p>
+
+  <div class="steps-grid reveal">
+    <div class="step-card">
+      <div class="step-num">01 / CAPTURE</div>
+      <span class="step-icon">🔌</span>
+      <div class="step-title">Plug in the dongle</div>
+      <div class="step-body">The Acty OBD-II hardware connects to your vehicle's diagnostic port and streams real-time PID data over Bluetooth to your phone. 123 parameters captured per session.</div>
+      <span class="step-tag">BLE · SPP · Real-time</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02 / ANALYZE</div>
+      <span class="step-icon">⚙️</span>
+      <div class="step-title">Local ML pipeline</div>
+      <div class="step-body">Telemetry runs through on-device models for anomaly detection, predictive maintenance scoring, oil health estimation, and battery health — all processed locally.</div>
+      <span class="step-tag">Isolation Forest · XGBoost · LSTM</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03 / VERIFY</div>
+      <span class="step-icon">🔏</span>
+      <div class="step-title">Tamper-evident reports</div>
+      <div class="step-body">Every session report is cryptographically signed with Ed25519. Reports can be independently verified by mechanics, insurers, or buyers — and can't be altered after signing.</div>
+      <span class="step-tag">Ed25519 · Verifiable · Portable</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04 / OWN</div>
+      <span class="step-icon">🔐</span>
+      <div class="step-title">You hold the keys</div>
+      <div class="step-body">Your telemetry is encrypted with your key before it ever leaves your device. Acty Labs cannot read your data. No data brokerage. Revenue comes from hardware and verified reports — not you.</div>
+      <span class="step-tag">Owner-encrypted · Zero-knowledge</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-label">features</div>
+  <h2>Built for drivers,<br>developers, and fleets.</h2>
+
+  <div class="features-layout">
+    <div class="feature-list reveal">
+      <div class="feature-item">
+        <div class="feature-header">
+          <div class="feature-dot"></div>
+          <div class="feature-title">123-PID real-time capture</div>
+        </div>
+        <div class="feature-body">Full OBD-II PID logging across engine, fuel, emissions, thermal, and electrical systems. Session data is timestamped and indexed for trend analysis across drives.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-header">
+          <div class="feature-dot"></div>
+          <div class="feature-title">Predictive maintenance alerts</div>
+        </div>
+        <div class="feature-body">XGBoost and Random Forest models flag oil change windows, battery degradation, and anomalous sensor patterns before they become failures — trained on your vehicle's own history.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-header">
+          <div class="feature-dot"></div>
+          <div class="feature-title">FSM-grounded AI diagnostics</div>
+        </div>
+        <div class="feature-body">A local RAG pipeline grounds every AI response in your vehicle's factory service manual. Answers are specific to your make, model, and engine — not generic web scraping.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-header">
+          <div class="feature-dot"></div>
+          <div class="feature-title">Federated learning — no raw data leaves</div>
+        </div>
+        <div class="feature-body">Fleet and aggregate insights are derived via Flower federated learning with differential privacy (ε ≤ 1.0) and secure aggregation. Your raw telemetry never touches Acty's servers.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-header">
+          <div class="feature-dot"></div>
+          <div class="feature-title">Open API for developers</div>
+        </div>
+        <div class="feature-body">FastAPI backend with documented endpoints for session data, ML scores, and report generation. Build your own dashboards, integrations, or fleet tooling on top of Acty's pipeline.</div>
+      </div>
+    </div>
+
+    <!-- Terminal -->
+    <div class="terminal reveal">
+      <div class="terminal-bar">
+        <div class="term-dot term-dot-r"></div>
+        <div class="term-dot term-dot-y"></div>
+        <div class="term-dot term-dot-g"></div>
+        <span class="terminal-label">acty · session report</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-section">session · 2026-03-16</div>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">acty report --verify --session 20260316</span></div>
+        <div class="t-blank"></div>
+        <div class="t-line"><span class="t-out">✓ signature valid · Ed25519</span></div>
+        <div class="t-line"><span class="t-out">✓ 396 frames · 21.9 min · 16.0 km</span></div>
+        <div class="t-blank"></div>
+        <div class="t-section">ml scores</div>
+        <div class="t-line"><span class="t-out">  coolant_warmup     normal  (3.4 min)</span></div>
+        <div class="t-line"><span class="t-out">  oil_health         normal  (92°C peak)</span></div>
+        <div class="t-line"><span class="t-out-w">  ltft_trend         watch   (−8.2%)</span></div>
+        <div class="t-line"><span class="t-out-w">  timing_retard      watch   (−14.5° peak)</span></div>
+        <div class="t-line"><span class="t-out">  battery_voltage    normal  (14.29V avg)</span></div>
+        <div class="t-line"><span class="t-out">  dtc_codes          none</span></div>
+        <div class="t-blank"></div>
+        <div class="t-section">privacy</div>
+        <div class="t-line"><span class="t-out">  encrypted_with     owner_key</span></div>
+        <div class="t-line"><span class="t-out">  acty_readable      false</span></div>
+        <div class="t-line"><span class="t-out">  data_sold          false</span></div>
+        <div class="t-blank"></div>
+        <div class="t-line"><span class="t-prompt">$</span><span class="blink"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="privacy-section" id="privacy">
+  <div class="section-label">privacy architecture</div>
+  <h2>Your car generates<br>valuable data. Keep it.</h2>
+  <p class="section-sub reveal">Traditional telematics companies make money selling your driving data to insurers, dealers, and data brokers. Acty's business model is hardware and verified reports — not you.</p>
+
+  <div class="privacy-grid reveal">
+    <div class="privacy-card">
+      <span class="privacy-card-icon">🔑</span>
+      <div class="privacy-card-title">Owner-encrypted telemetry</div>
+      <div class="privacy-card-body">All session data is encrypted with your key before leaving your device. Acty Labs holds no decryption capability for your raw telemetry.</div>
+    </div>
+    <div class="privacy-card">
+      <span class="privacy-card-icon">🪪</span>
+      <div class="privacy-card-title">Zero-knowledge identity</div>
+      <div class="privacy-card-body">Rotating pseudonymous tokens mean your identity is never tied to your driving sessions, even in aggregate analytics.</div>
+    </div>
+    <div class="privacy-card">
+      <span class="privacy-card-icon">🧮</span>
+      <div class="privacy-card-title">Differential privacy</div>
+      <div class="privacy-card-body">Fleet and population-level model improvements use ε ≤ 1.0 differential privacy and secure aggregation via the Flower framework.</div>
+    </div>
+    <div class="privacy-card">
+      <span class="privacy-card-icon">📋</span>
+      <div class="privacy-card-title">Verifiable signed reports</div>
+      <div class="privacy-card-body">Ed25519 signatures let mechanics, insurers, or prospective buyers verify a report's authenticity and integrity — independently, without trusting Acty.</div>
+    </div>
+    <div class="privacy-card">
+      <span class="privacy-card-icon">🚫</span>
+      <div class="privacy-card-title">No data brokerage — ever</div>
+      <div class="privacy-card-body">Acty's revenue comes from hardware sales and verified report fees. Selling your data to third parties is structurally incompatible with our architecture, not just policy.</div>
+    </div>
+    <div class="privacy-card">
+      <span class="privacy-card-icon">💻</span>
+      <div class="privacy-card-title">Local-first inference</div>
+      <div class="privacy-card-body">ML models run on-device or on your own hardware. Cloud inference is optional and always opt-in. Your driving patterns stay on your hardware by default.</div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIENCE -->
+<div class="audience-strip">
+  <div class="section-label">who it's for</div>
+  <h2>One platform.<br>Three audiences.</h2>
+  <div class="audience-grid reveal">
+    <div class="audience-card">
+      <span class="audience-tag tag-consumer">Car owners</span>
+      <div class="audience-title">Know your car before your mechanic does.</div>
+      <div class="audience-body">Real diagnostic insights, maintenance predictions, and signed service histories you actually own — not locked in a dealer's system.</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-tag tag-dev">Developers</span>
+      <div class="audience-title">Build on a real automotive data pipeline.</div>
+      <div class="audience-body">Open FastAPI backend, documented PID schema, ML model hooks, and a local RAG layer grounded in factory service manuals. Build what the OEM portals won't let you.</div>
+    </div>
+    <div class="audience-card">
+      <span class="audience-tag tag-biz">Fleet & enterprise</span>
+      <div class="audience-title">Fleet intelligence without the surveillance.</div>
+      <div class="audience-body">Aggregate health scoring, predictive maintenance scheduling, and verifiable service records across your fleet — with federated privacy guarantees baked in.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">acty_labs © 2026</span>
+  <ul class="footer-links">
+    <li><a href="mailto:hello@acty-labs.com">hello@acty-labs.com</a></li>
+    <li><a href="https://github.com/JacobChamblee" target="_blank">github</a></li>
+  </ul>
+  <span class="footer-copy">Built in Texas. Privacy by design.</span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(r => io.observe(r));
+</script>
+</body>
+</html>
